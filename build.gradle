@@ -1,30 +1,61 @@
 buildscript {
     repositories {
-        jcenter()
-        google()
-        mavenCentral()
         mavenLocal()
-        maven { url "https://plugins.gradle.org/m2/" }
+        mavenCentral()
+        jcenter()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.0.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "org.jetbrains.kotlin:kotlin-serialization:$kotlin_version"
-        classpath "com.getkeepsafe.dexcount:dexcount-gradle-plugin:$dexcount_version"
-        classpath "org.jetbrains.dokka:dokka-gradle-plugin:$dokka_version"
     }
 }
 
-allprojects {
-    repositories {
-        mavenLocal()
-        jcenter()
-        mavenCentral()
-        google()
-        maven { url "https://kotlin.bintray.com/kotlinx" }
+apply plugin: 'application'
+apply plugin: 'kotlin'
+apply plugin: 'kotlinx-serialization'
+
+mainClassName="com.github.insanusmokrassar.AutoPostTelegramBot.LaunchKt"
+
+repositories {
+    mavenLocal()
+    jcenter()
+    mavenCentral()
+    maven { url "https://kotlin.bintray.com/kotlinx" }
+    maven { url "https://dl.bintray.com/kotlin/ktor" }
+
+    if ((project.hasProperty('GITHUB_USER') || System.getenv('GITHUB_USER') != null) && (project.hasProperty('GITHUB_TOKEN') || System.getenv('GITHUB_TOKEN') != null)) {
+        maven {
+            url "https://maven.pkg.github.com/InsanusMokrassar/AutoPostTelegramBot"
+            credentials {
+                username = project.hasProperty('GITHUB_USER') ? project.property('GITHUB_USER') : System.getenv('GITHUB_USER')
+                password = project.hasProperty('GITHUB_TOKEN') ? project.property('GITHUB_TOKEN') : System.getenv('GITHUB_TOKEN')
+            }
+        }
+        maven {
+            url "https://maven.pkg.github.com/InsanusMokrassar/AutoPostPollsRatingPlugin"
+            credentials {
+                username = project.hasProperty('GITHUB_USER') ? project.property('GITHUB_USER') : System.getenv('GITHUB_USER')
+                password = project.hasProperty('GITHUB_TOKEN') ? project.property('GITHUB_TOKEN') : System.getenv('GITHUB_TOKEN')
+            }
+        }
+        maven {
+            url "https://maven.pkg.github.com/InsanusMokrassar/AutoPostBotLikesPlugin"
+            credentials {
+                username = project.hasProperty('GITHUB_USER') ? project.property('GITHUB_USER') : System.getenv('GITHUB_USER')
+                password = project.hasProperty('GITHUB_TOKEN') ? project.property('GITHUB_TOKEN') : System.getenv('GITHUB_TOKEN')
+            }
+        }
     }
 }
 
-apply from: "./extensions.gradle"
-// apply from: "./github_release.gradle"
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation "dev.inmo:autoposttelegrambot:$auto_post_telegram_bot_version"
+    implementation "dev.inmo:autopostpollsratingplugin:$autopost_polls_ratings_version"
+
+    implementation "org.xerial:sqlite-jdbc:$sqlite_version"
+
+    // Use JUnit test framework
+    testImplementation 'junit:junit:4.12'
+}
